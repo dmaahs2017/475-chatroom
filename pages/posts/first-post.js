@@ -1,6 +1,6 @@
-import Link from 'next/link'
-import Head from 'next/head'
-import Script from 'next/script'
+import Link from "next/link";
+import Head from "next/head";
+import Script from "next/script";
 
 export default function FirstPost() {
   return (
@@ -15,5 +15,5 @@ export default function FirstPost() {
         </Link>
       </h2>
     </>
-  )
+  );
 }
