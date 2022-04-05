@@ -12,7 +12,13 @@
     "@mui/material": "^5.4.4",
     "next": "latest",
     "next-auth": "^4.2.1",
+    "npm": "^8.6.0",
     "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "react-dom": "17.0.2",
+    "socket.io": "^4.4.1",
+    "socket.io-client": "^4.4.1"
+  },
+  "devDependencies": {
+    "prettier": "^2.6.2"
   }
 }
