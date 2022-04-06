@@ -1,16 +1,16 @@
 import { useSession, signOut } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import io from "Socket.IO-client";
 
 let socket;
 
 export default function Chatroom() {
   const { data: session } = useSession();
-  const [input, setInput] = useState("");
+  const [connected, setConnected] = useState(false);
+  const messageLogRef = useRef(null);
 
-  useEffect(() => {
-    socketInitializer();
-  }, []);
+  //useEffect(() => {
+  //}, []);
 
   const socketInitializer = async () => {
     await fetch("api/socket");
@@ -20,29 +20,56 @@ export default function Chatroom() {
       console.log("connected");
     });
 
-    socket.on("update-input", (msg) => {
-      setInput(msg);
+    socket.on("from-server", (msg) => {
+      console.log("Recieved messsage");
+      updateHistory(msg);
     });
   };
 
-  const onChangeHandler = (e) => {
-    setInput(e.target.value);
-    socket.emit("input-change", e.target.value);
+  const updateHistory = (msg) => {
+    messageLogRef.current.textContent += "\n".concat(msg);
+  };
+
+  const onSubmitHandler = (e) => {
+    console.log("Handling Submit");
+    if (e.key === "Enter") {
+      console.log("Sent chat");
+      socket.emit("to-server", e.target.value);
+      updateHistory(e.target.value);
+      e.target.value = "";
+    }
+  };
+
+  const connect = () => {
+    socketInitializer();
+    setConnected(true);
   };
 
   if (session) {
-    return (
-      <div>
-        <input
-          placeholder="Type Something"
-          value={input}
-          onChange={onChangeHandler}
-        />
-        <br />
-        <button onClick={() => signOut()}>Sign out</button>
-      </div>
-    );
+    if (connected) {
+      return (
+        <div>
+          <textarea
+            ref={messageLogRef}
+            readOnly={true}
+            style={{ height: 600, width: 600 }}
+          ></textarea>
+          <br />
+          <input placeholder="Type Something" onKeyPress={onSubmitHandler} />
+          <br />
+          <button onClick={() => signOut()}>Sign out</button>
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          <button onClick={connect}>Connect to chatroom</button>
+          <br />
+          <button onClick={() => signOut()}>Sign out</button>
+        </div>
+      );
+    }
   } else {
-    return <p>Not signed in, redirecting</p>;
+    return <p>Not Signed in</p>;
   }
 }
