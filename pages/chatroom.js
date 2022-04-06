@@ -3,24 +3,46 @@ import { useEffect, useState, useRef } from "react";
 import io from "Socket.IO-client";
 
 let socket;
+let channel;
+
+const from = (channel) => {
+  return "from-".concat(channel);
+};
+
+const to = (channel) => {
+  return "to-".concat(channel);
+};
 
 export default function Chatroom() {
   const { data: session } = useSession();
+  const [channels, setChannels] = useState([]);
+  //const [channel, setChannel] = useState(null);
   const [connected, setConnected] = useState(false);
+
+  const channelRef = useRef(null);
   const messageLogRef = useRef(null);
 
   //useEffect(() => {
-  //}, []);
+  //channels =
+  //});
 
   const socketInitializer = async () => {
-    await fetch("api/socket");
+    await fetch("api/socket", {
+      headers: {
+        Accept: "application/json",
+        "Conent-Type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify({ channel: channel }),
+    });
+
     socket = io();
 
     socket.on("connect", () => {
-      console.log("connected");
+      console.log("connected to server");
     });
 
-    socket.on("from-server", (msg) => {
+    socket.on(from(channel), (msg) => {
       console.log("Recieved messsage");
       updateHistory(msg);
     });
@@ -31,24 +53,26 @@ export default function Chatroom() {
   };
 
   const onSubmitHandler = (e) => {
-    console.log("Handling Submit");
     if (e.key === "Enter") {
-      console.log("Sent chat");
-      socket.emit("to-server", e.target.value);
+      socket.emit(to(channel), e.target.value);
       updateHistory(e.target.value);
       e.target.value = "";
     }
   };
 
-  const connect = () => {
-    socketInitializer();
-    setConnected(true);
+  const channelEnterHandler = (e) => {
+    if (e.key === "Enter") {
+      channel = e.target.value;
+      socketInitializer();
+      setConnected(true);
+    }
   };
 
   if (session) {
     if (connected) {
       return (
         <div>
+          <p>Connected to channel: {channel}</p>
           <textarea
             ref={messageLogRef}
             readOnly={true}
@@ -63,7 +87,11 @@ export default function Chatroom() {
     } else {
       return (
         <div>
-          <button onClick={connect}>Connect to chatroom</button>
+          <input
+            ref={channelRef}
+            placeholder="Enter a channel"
+            onKeyPress={channelEnterHandler}
+          ></input>
           <br />
           <button onClick={() => signOut()}>Sign out</button>
         </div>

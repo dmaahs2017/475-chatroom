@@ -1,20 +1,37 @@
 import { Server } from "Socket.IO";
 
 const SocketHandler = (req, res) => {
+  if (req.method !== "POST") {
+    res.status(405).send({ message: "Only POST requests allowed" });
+    return;
+  }
+
+  const body = JSON.parse(req.body);
+  console.log(body);
+  if (!body.channel) {
+    res.status(400).send({ message: "No channel specified" });
+    return;
+  }
+
+  const from = "from-".concat(body.channel);
+  const to = "to-".concat(body.channel);
+
   if (res.socket.server.io) {
     console.log("Socket is already running");
   } else {
     console.log("Socket is initializing");
     const io = new Server(res.socket.server);
     res.socket.server.io = io;
-
-    io.on("connection", (socket) => {
-      socket.on("to-server", (msg) => {
-        console.log("Forwarding message");
-        socket.broadcast.emit("from-server", msg);
-      });
-    });
   }
+
+  const io = res.socket.server.io;
+  io.on("connection", (socket) => {
+    if (!socket.eventNames().includes(to)) {
+      socket.on(to, (msg) => {
+        socket.broadcast.emit(from, msg);
+      });
+    }
+  });
 
   res.end();
 };
