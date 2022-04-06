@@ -42,20 +42,28 @@ export default function Chatroom() {
       console.log("connected to server");
     });
 
+    socket.emit(to(channel), {
+      user: session.user.name,
+      text: "Connected to the channel",
+    });
+
     socket.on(from(channel), (msg) => {
       console.log("Recieved messsage");
-      updateHistory(msg);
+      updateHistory(msg.user, msg.text);
     });
   };
 
-  const updateHistory = (msg) => {
-    messageLogRef.current.textContent += "\n".concat(msg);
+  const updateHistory = (user, msg) => {
+    messageLogRef.current.textContent += "\n".concat(`${user}: ${msg}`);
   };
 
   const onSubmitHandler = (e) => {
     if (e.key === "Enter") {
-      socket.emit(to(channel), e.target.value);
-      updateHistory(e.target.value);
+      socket.emit(to(channel), {
+        user: session.user.name,
+        text: e.target.value,
+      });
+      updateHistory(session.user.name, e.target.value);
       e.target.value = "";
     }
   };
