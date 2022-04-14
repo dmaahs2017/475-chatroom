@@ -1,6 +1,6 @@
 import { useSession, signOut } from "next-auth/react";
-import { useEffect, useState, useRef } from "react";
-import io from "Socket.IO-client";
+import { useState, useRef } from "react";
+import io from "socket.io-client";
 
 let socket;
 let channel;
@@ -15,16 +15,10 @@ const to = (channel) => {
 
 export default function Chatroom() {
   const { data: session } = useSession();
-  const [channels, setChannels] = useState([]);
-  //const [channel, setChannel] = useState(null);
   const [connected, setConnected] = useState(false);
 
   const channelRef = useRef(null);
   const messageLogRef = useRef(null);
-
-  //useEffect(() => {
-  //channels =
-  //});
 
   const socketInitializer = async () => {
     await fetch("api/socket", {
