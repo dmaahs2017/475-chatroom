@@ -3,6 +3,7 @@ import Link from "next/link";
 
 export default function Index() {
   const { data: session } = useSession();
+
   if (session) {
     return (
       <>
