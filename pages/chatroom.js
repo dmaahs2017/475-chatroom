@@ -47,8 +47,11 @@ export default function Chatroom() {
       text: "Connected to the channel",
     });
 
-    socket.on(from(channel), (msg) => {
-      console.log("Recieved messsage");
+
+    socket.on("sent-to-" + session.user.name, (msg) => {
+        // decrypt message with my key
+        //
+        // update the textbox with decrypted message
       updateHistory(msg.user, msg.text);
     });
   };
@@ -57,8 +60,15 @@ export default function Chatroom() {
     messageLogRef.current.textContent += "\n".concat(`${user}: ${msg}`);
   };
 
+    // Send a message
   const onSubmitHandler = (e) => {
     if (e.key === "Enter") {
+
+        // get all the users in the channel
+        //
+        // for each user, use their lock (public key) to encrypt the messgage
+        //      and send the message to them "to-$(user)"
+        // 
       socket.emit(to(channel), {
         user: session.user.name,
         text: e.target.value,
