@@ -63,6 +63,7 @@ export default function Chatroom() {
         // for each user, use their lock (public key) to encrypt the messgage
         //      and send the message to them "to-$(user)"
         // 
+      console.log("Emitting message")
       socket.emit(to(channel), {
         user: session.user.name,
         text: e.target.value,

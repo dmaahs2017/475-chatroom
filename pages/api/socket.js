@@ -26,8 +26,10 @@ const SocketHandler = (req, res) => {
 
   const io = res.socket.server.io;
   io.on("connection", (socket) => {
+    console.log("User is connecting")
     if (!socket.eventNames().includes(to)) {
       socket.on(to, (msg) => {
+        console.log(msg)
         socket.broadcast.emit(from, msg);
       });
     }
