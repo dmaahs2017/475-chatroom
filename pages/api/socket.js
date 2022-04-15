@@ -1,5 +1,6 @@
 import { Server } from "socket.io";
 
+// TODO: Revamp for encryption
 const SocketHandler = (req, res) => {
   if (req.method !== "POST") {
     res.status(405).send({ message: "Only POST requests allowed" });
