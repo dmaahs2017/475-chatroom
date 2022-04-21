@@ -1,6 +1,6 @@
 import { useSession, signOut } from "next-auth/react";
 import { useEffect, useState, useRef } from "react";
-import io from "Socket.IO-client";
+import io from "socket.io-client";
 
 let socket;
 let channel;
